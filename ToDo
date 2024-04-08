@@ -2,7 +2,7 @@ NE PAS OUBLIER DE :
 - Commenter en anglais (si possible)
 - Décrire les modifications lorsque l'on commit
 - Ecrire le rapport
-- Ne pas paniquer parce que le code marche pas
+- Ne pas paniquer parce que le code marche pas 
 
 Génération procédurale: 
     Seed based thing => aléatoire par rapport à la seed
@@ -20,6 +20,7 @@ Génération procédurale:
 
 Affichage:
     Afficher une zone réduite de la map (changement de repère pour que position soit centrale)
+        Murs/perso/monstres/items
     PV, XP, Inventaire (pt fatigue/bouffe??)
     Timer
     Nom du joueur (taille limitée)
