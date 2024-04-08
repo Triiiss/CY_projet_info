@@ -20,6 +20,7 @@ typedef struct
 int main(){
     int seed=-1;
 
+    printf("Ceci est un test pour voir si mon espace local est lié avec l'espace à distance");
     
     return 0;
 }
