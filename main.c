@@ -20,7 +20,7 @@ typedef struct
 int main(){
     int seed=-1;
 
-    printf("AAAAAAAAAAH");
+    printf("it's a me Mario");
     
     return 0;
 }
