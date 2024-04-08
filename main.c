@@ -4,11 +4,11 @@
 
 typedef struct 
 {
-    int x;
-    int y;
-    int pv;
-    float exp;
-    int* bag;
+    int x; //player position on the x axis
+    int y; //player position on the y axis
+    int pv; // player health, must be above 0
+    float exp; //player experience point
+    int* bag;  // inventory of the player, contain object
 }joueur;
 
 
