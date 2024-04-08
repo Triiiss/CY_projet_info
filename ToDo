@@ -25,11 +25,13 @@ Affichage:
     Nom du joueur (taille limitée)
     Option de sauvegarde
     Option de quitter jusqu'à écran de départ
+    Difficulté
+    Journal des taches (nbr de taches restantes/nbr tache total)
 
 Personnage:
     Structure : 
-        PV, 
-        XP, 
+        PV
+        XP
         Inventaire 
         (pt fatigue/bouffe??)/O
         Nom du joueur
@@ -40,18 +42,34 @@ Déplacement:
 Victoire/défaite:
     Si PV==0
           recommence du début avec mm salles découvertes
-          Pt d'XP réduits
+          Pt d'XP réduits   (max 7)
     Défaite
           décompte d'oxygène en secondes => timer fini
     vitcoire
-        Si toutes les taches sont faites  
-        Si battre le final boss ? :0        /O
+        Si toutes les taches sont faites        (cf journal des taches)
+        Si battre le final boss => récupéré avec des clés sur la map ? :0        /O
 
 Menu:
       Nouvelle partie
             Nom du joueur demandé
+            Choisir difficulté ? (nbr monstre/nbr salles/nbr taches)        /O
       Charger une partie
             Sauvegarde
                 Avec le nom du joueur
                 Temps cohérent
       Quitter
+
+Gameplay:
+        Se déplacer à travers les salles
+        Taches
+            Mini jeu ou juste un clic ?
+        Monstres
+            One shot ou non ?
+        Items
+            Peut en ramasser et réparer (clés /O, armes, soin, bouffe, expérience (livres))
+            Réparer coute xp            /O
+         
+Easter egg                                   /O
+        Des items avec des ref (pie Undertale) ?  /O
+        Seed 0 0 ou autre nbr => ref ? (portal w rats)        /O
+        
