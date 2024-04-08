@@ -11,7 +11,7 @@
 
 int main(){
 
-
+    printf("Et ouaaAAIIS (comme les boxeurs thai font)");
 
     
     return 0;
