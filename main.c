@@ -3,7 +3,7 @@
 #include <time.h>
 #include <fcntl.h>          //Library that allows to print Unicode text
 #include <io.h>
-//#include <ncurses.h>  //library that allows to move with arrow keys (need to check docstring)
+//#include <curses.h>  //library that allows to move with arrow keys (need to check docstring)
 
 typedef struct 
 {
@@ -15,6 +15,7 @@ typedef struct
 }Player;
 
 int titleScreen(){
+    int test=-1;
     _setmode(_fileno(stdout),_O_U16TEXT);       //Allows to print Unicode text 
     wprintf(L"╓─╴  ╓──╖  ╓─╴       ╶╥╴ ╓─╴\n");  //Title
     wprintf(L"║    ║  ║  ╙─╖  ║╲╱║  ║  ║  \n");
@@ -30,6 +31,9 @@ int titleScreen(){
     wprintf(L"Continue Game\n");
     wprintf(L"Quit\n");
     
+    printf("%d",test);
+    //test=getch();
+    printf("%d",test);
 
     return 0;
 }
