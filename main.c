@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <fcntl.h>
+#include <fcntl.h>          //Library that allows to print Unicode text
 //#include <ncurses.h>  //library that allows to move with arrow keys (need to check docstring)
 
 typedef struct 
@@ -14,22 +14,18 @@ typedef struct
 }Player;
 
 int titleScreen(){
-    _setmode(_fileno(stdout),_O_U16TEXT);
-    wprintf(L"╓─╴  ╓──╖  ╓─╴       ╶╥╴ ╓─╴\n");  //Title  1
+    _setmode(_fileno(stdout),_O_U16TEXT);       //Allows to print Unicode text 
+    wprintf(L"╓─╴  ╓──╖  ╓─╴       ╶╥╴ ╓─╴\n");  //Title
     wprintf(L"║    ║  ║  ╙─╖  ║╲╱║  ║  ║  \n");
     wprintf(L"╙─╴  ╙──╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙─╴\n");
-
-    wprintf(L"         ╓─╴        \n");  //Title 2
-    wprintf(L"╓╴  ╓─╖  ╙─╖  ║╲╱║ ╶╥╴ ╓╴ \n");
-    wprintf(L"╙╴  ╙─╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙╴\n");
-
     wprintf(L"      ╶╥╴ ╶╥╴\n");
     wprintf(L"       ╙───╢  ╓──╖       ╶╥──╮  ╥─╴  ╶╥─╮\n");
     wprintf(L"           ║  ║  ║  ║╲ ║  ║  │  ╟╴    ╟─╯\n");
     wprintf(L"          ╶╨╴ ╙──╜  ║ ╲║ ╶╨──╯  ╨─╴  ╶╨╴╲\n");
 
-    wprintf(L"\n\n");
-    wprintf(L"New Game\n");
+    printf("\n\n");
+
+    wprintf(L"New Game\n");                 //Choices
     wprintf(L"Continue Game\n");
     wprintf(L"Quit\n");
     
