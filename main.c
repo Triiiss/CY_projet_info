@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <fcntl.h>          //Library that allows to print Unicode text
+#include <io.h>
 //#include <ncurses.h>  //library that allows to move with arrow keys (need to check docstring)
 
 typedef struct 
