@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <ncurses.h>  //library that allows to move with arrow keys (need to check docstring)
+#include <fcntl.h>
+//#include <ncurses.h>  //library that allows to move with arrow keys (need to check docstring)
 
 typedef struct 
 {
@@ -13,23 +14,24 @@ typedef struct
 }Player;
 
 int titleScreen(){
-    printf("╓─╴  ╓──╖  ╓─╴       ╶╥╴ ╓─╴\n");  //Title  1
-    printf("║    ║  ║  ╙─╖  ║╲╱║  ║  ║  \n");
-    printf("╙─╴  ╙──╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙─╴\n");
+    _setmode(_fileno(stdout),_O_U16TEXT);
+    wprintf(L"╓─╴  ╓──╖  ╓─╴       ╶╥╴ ╓─╴\n");  //Title  1
+    wprintf(L"║    ║  ║  ╙─╖  ║╲╱║  ║  ║  \n");
+    wprintf(L"╙─╴  ╙──╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙─╴\n");
 
-    printf("         ╓─╴        \n");  //Title 2
-    printf("╓╴  ╓─╖  ╙─╖  ║╲╱║ ╶╥╴ ╓╴ \n");
-    printf("╙╴  ╙─╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙╴\n");
+    wprintf(L"         ╓─╴        \n");  //Title 2
+    wprintf(L"╓╴  ╓─╖  ╙─╖  ║╲╱║ ╶╥╴ ╓╴ \n");
+    wprintf(L"╙╴  ╙─╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙╴\n");
 
-    printf("      ╶╥╴ ╶╥╴\n");
-    printf("       ╙───╢  ╓──╖       ╶╥──╮  ╥─╴  ╶╥─╮\n");
-    printf("           ║  ║  ║  ║╲ ║  ║  │  ╟╴    ╟─╯\n");
-    printf("          ╶╨╴ ╙──╜  ║ ╲║ ╶╨──╯  ╨─╴  ╶╨╴╲\n");
+    wprintf(L"      ╶╥╴ ╶╥╴\n");
+    wprintf(L"       ╙───╢  ╓──╖       ╶╥──╮  ╥─╴  ╶╥─╮\n");
+    wprintf(L"           ║  ║  ║  ║╲ ║  ║  │  ╟╴    ╟─╯\n");
+    wprintf(L"          ╶╨╴ ╙──╜  ║ ╲║ ╶╨──╯  ╨─╴  ╶╨╴╲\n");
 
-    printf("\n\n");
-    printf("New Game\n");
-    printf("Continue Game\n");
-    printf("Quit\n");
+    wprintf(L"\n\n");
+    wprintf(L"New Game\n");
+    wprintf(L"Continue Game\n");
+    wprintf(L"Quit\n");
     
 
     return 0;
@@ -46,8 +48,6 @@ int main(){
         printf("Ceci est un message d'erreur");
         return -1;
     }
-
-
     
     return 0;
 }
