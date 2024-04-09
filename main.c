@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ncurses.h>
 
 typedef struct 
 {
@@ -9,18 +10,44 @@ typedef struct
     int pv; // player health, must be above 0
     float exp; //player experience point
     int* bag;  // inventory of the player, contain object
-}player;
+}Player;
 
+int titleScreen(){
+    printf("╓─╴  ╓──╖  ╓─╴       ╶╥╴ ╓─╴\n");  //Title  1
+    printf("║    ║  ║  ╙─╖  ║╲╱║  ║  ║  \n");
+    printf("╙─╴  ╙──╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙─╴\n");
 
+    printf("         ╓─╴        \n");  //Title 2
+    printf("╓╴  ╓─╖  ╙─╖  ║╲╱║ ╶╥╴ ╓╴ \n");
+    printf("╙╴  ╙─╜  ╶─╜ ╶╨╴ ╨╴╶╨╴ ╙╴\n");
 
+    printf("      ╶╥╴ ╶╥╴\n");
+    printf("       ╙───╢  ╓──╖       ╶╥──╮  ╥─╴  ╶╥─╮\n");
+    printf("           ║  ║  ║  ║╲ ║  ║  │  ╟╴    ╟─╯\n");
+    printf("          ╶╨╴ ╙──╜  ║ ╲║ ╶╨──╯  ╨─╴  ╶╨╴╲\n");
 
+    printf("\n\n");
+    printf("New Game\n");
+    printf("Continue Game\n");
+    printf("Quit\n");
+    
 
+    return 0;
+}
 
 
 int main(){
     int seed=-1;
+    int error = 0;
 
-    printf("it's a me Mario");
+    error = titleScreen();
+
+    if (error){            //Show the error if one (if menu return != 0) Robustesse
+        printf("Ceci est un message d'erreur");
+        return -1;
+    }
+
+
     
     return 0;
 }
