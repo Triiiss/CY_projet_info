@@ -2,8 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <fcntl.h>          //Library that allows to print Unicode text
+<<<<<<< HEAD
 #include <io.h>
 //#include <ncurses.h>  //library that allows to move with arrow keys (need to check docstring)
+=======
+//#include <curses.h>  //library that allows to move with arrow keys (need to check docstring)
+>>>>>>> 16665135ca981cd71acf3a630363de9236e2727b
 
 typedef struct 
 {
