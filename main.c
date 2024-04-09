@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <ncurses.h>
+#include <ncurses.h>  //library that allows to move with arrow keys (need to check docstring)
 
 typedef struct 
 {
@@ -42,7 +42,7 @@ int main(){
 
     error = titleScreen();
 
-    if (error){            //Show the error if one (if menu return != 0) Robustesse
+    if (error){            //Print the error if one (if menu return != 0) => Robustesse
         printf("Ceci est un message d'erreur");
         return -1;
     }
