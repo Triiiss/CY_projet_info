@@ -124,7 +124,8 @@ int titleScreen(){
                         case 2:                         //Settings
                             break;
                         case 3:
-                            if (quitter()){           //Quit
+                            if (quitter()==1){           //Quit
+                                endwin();
                                 return 0;
                             }
                             break;
