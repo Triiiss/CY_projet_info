@@ -75,7 +75,7 @@ FAIT:
 
 OPTIONNEL :
         (pt fatigue/bouffe??)/O
-        Choisir difficulté ? (nbr monstre/nbr salles/nbr taches) dans les settings        /O
+        Choisir difficulté ? (taille fenetre/nbr salles/nbr taches/nbr monstres) dans les settings        /O
         Easter egg                                   /O
                 Des items avec des ref (pie Undertale) ?  /O
                 Seed 0 0 ou autre nbr => ref ? (portal w rats)        /O
