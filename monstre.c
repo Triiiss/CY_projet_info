@@ -39,7 +39,7 @@ typedef struct{
     float exp;
     Weapon reward_wpn;
     Object reward_obj;
-
+    int tab[SALLE];
 }Enemies;
 
 typedef struct{
@@ -49,6 +49,7 @@ typedef struct{
     //Door* doors;    //List of the different doors
     int width;      //At least 3
     int lenght;     //At least 3
+    Enemies enemies;
 }Room;
 
 void init_weapon(Weapon* wpn){
@@ -170,21 +171,23 @@ int déplacement_enemies(Player*j1,Enemies*j2){
         else if((j1->x)>(j2->x)){
             j2->x++;
         }
-    }
 }
+
 
 int main(){
     Player plr;
-    Enemies ens;
-    Room rm;
+    Enemies enemies;
+    Room n;
+    Room room[SALLE];
     int x=time(NULL);
-    int tab[SALLE];
     time_t time=time(NULL);
     time_t time1;
+    tab[ndoor];
     while(1){
         time1=time(NULL);            //appel la fonction toute les secondes pour faire bouger l'enemie
         if(time1-time>=1){
-            déplacement_enemies(plr,ens); 
+            //normalement, prend l'enemie qui se situe dans la même salle que le joueur
+            déplacement_enemies(&plr,&(room[n.ndoor].enemies)); 
         }
     }
 
