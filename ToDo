@@ -6,14 +6,6 @@ NE PAS OUBLIER DE :
 
 A FAIRE :
 - Monstres : affichage, structure salle, attaques, path finding différents types (one shot ou non?)
-- Inventaire
-- Objets : affichage, génération structure salle, pick up, use inventaire (soin, exp, atck)( armes, soin, expérience (livres))
-- Sauvegarde : sauvegarder dans pause, charger (m^ salles, obj, perso, temps)
-    Salles : Structure : items
-                          enemis ?
-                          Outils pour réparer des items 
-                        taches
-
 
 OPTIONNEL :
         (pt fatigue/bouffe??)/O
