@@ -16,8 +16,8 @@ main.o: game.c main.h
 	gcc -c main.c -o main.o -lncursesw
 
 exec: rooms.o affichage.o save.o game.o main.o main.h
-	gcc rooms.o affichage.o save.o game.o main.o -lncursesw -o cy-yonder
+	gcc rooms.o affichage.o save.o game.o main.o -lncursesw -o cy_yonder
 
 clean:
 	rm -f *.o
-	rm cy yonder
+	rm cy_yonder
