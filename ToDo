@@ -8,15 +8,16 @@ A FAIRE :
 - Monstres : affichage, structure salle, attaques, path finding différents types (one shot ou non?)
 
 OPTIONNEL :
-        (pt fatigue/bouffe??)/O
+          Couleur
         Choisir difficulté ? (taille fenetre/nbr salles/nbr taches/nbr monstres) dans les settings        /O
+          Taches = Mini jeu
+
+        (pt fatigue/bouffe??)/O
         Easter egg                                   /O
                 Des items avec des ref (pie Undertale) ?  /O
                 Seed 0 0 ou autre nbr => ref ? (portal w rats)        /O
 
             Si battre le final boss => récupéré avec des clés sur la map ?revenir en 0,0 (afficher qu'il faut aller en 0,0 pour aller faire le boss) => TP dans une arène de boss :0        /O
-          Couleur
-          Taches = Mini jeu
           clés /O
                 Réparer coute xp            /O
 
