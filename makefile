@@ -3,8 +3,8 @@ all: cy_yonder
 rooms.o: rooms.c main.h
 	gcc -c rooms.c -o rooms.o -lncursesw
 
-affichage.o: affichage.c main.h
-	gcc -c affichage.c -o affichage.o -lncursesw
+display.o: display.c main.h
+	gcc -c display.c -o display.o -lncursesw
 
 save.o: save.c main.h
 	gcc -c save.c -o save.o -lncursesw
