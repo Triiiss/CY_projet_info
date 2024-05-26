@@ -23,7 +23,6 @@
 #define SCREENH 35
 #define SCREENI 6
 #define BARPV 20
-#define MAXDATA 500000
 
 typedef struct{
     char icon;
@@ -1084,7 +1083,7 @@ void PrintInventory(Character* player,char* name,int seed, int tasks, time_t *be
 }
 
 // Saves ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/*
+
 int strequal(char* str1,char* str2){
     int size=strlen(str1);
     if(strlen(str2)!=size){
@@ -1108,7 +1107,6 @@ int NewSave(Dungeon spacestation, Character player,char* name,int seed,time_t ti
     }
     fseek(fp, 0, SEEK_END);
 
-    if(ftell(fp)<MAXDATA){      // IDk dude
         fprintf(fp,"{%s\n",name);
         fprintf(fp,"%d\n",seed);
         fprintf(fp,"%d\n",player.x);
@@ -1144,11 +1142,9 @@ int NewSave(Dungeon spacestation, Character player,char* name,int seed,time_t ti
         fprintf(fp,"}\n");
         fclose(fp);
         return 0;
-    }
     fclose(fp);
 
     return -2;
-    
 }
 
 int SavingChoice(Character player, char* name,int seed,  int tasks, time_t* timeBegin){
@@ -1195,36 +1191,31 @@ int SavingChoice(Character player, char* name,int seed,  int tasks, time_t* time
 }
 
 int SearchSave(char* name){
-    FILE* fichier=NULL;
+    FILE* fp=NULL;
     int cursor=0;
     int size=0;
     size=strlen(name);
-    size--;
     char c=0;
-    fichier=fopen("saves.txt","r");
-    if (fichier == NULL){
+    fp=fopen("saves.txt","r");
+    if (fp == NULL){
         return 2;
     }
 
-    fseek(fichier,0,SEEK_SET);
-    c = fgetc(fichier);
+    fseek(fp,0,SEEK_SET);
+
     while(c!=EOF){
-        mvprintw(SCREENH+2,0,"%c %c",c,name[cursor]);
         if(c==name[cursor]){
-            mvprintw(SCREENH+3,0,"%d %d",cursor,size);
             cursor++;
-            if(cursor>=size){
-                return ftell(fichier);
+            if(cursor>=size || (cursor+1 == size && name[cursor] == '\n')){
+                return ftell(fp);
             }
         }
         else{
             cursor=0;
         }
-        refresh();
-        getch();
-        c=fgetc(fichier);
+        c=fgetc(fp);
     }
-    fclose(fichier);
+    fclose(fp);
     return -1;
 }
 
@@ -1232,8 +1223,9 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
     FILE *fp;
 
     if(SearchSave(name)!=-1){
-        fp=fopen("saves.txt","r");
+        fp=fopen("saves.txt","r+");
         fseek(fp,SearchSave(name),SEEK_SET);
+        fscanf(fp,"%s",name);
         fscanf(fp,"%d",seed);
         fscanf(fp,"%d",&(player->x));
         fscanf(fp,"%d",&(player->y));
@@ -1250,7 +1242,7 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
 
         for (int i=0;i<spacestation->nr_created;i++){
             fscanf(fp,"%d",&(spacestation->rooms[i].x));
-            /*fscanf(fp,"%d",&(spacestation->rooms[i].y));
+            fscanf(fp,"%d",&(spacestation->rooms[i].y));
             fscanf(fp,"%d",&(spacestation->rooms[i].H));
             fscanf(fp,"%d",&(spacestation->rooms[i].L));
             fscanf(fp,"%d",&(spacestation->rooms[i].tasks.x));
@@ -1298,8 +1290,8 @@ int getname(char** tab){
     return size;
 }
 
-int UpdateSave(Dungeon spacestation,Character j1,char* name,int seed,time_t start, time_t pause){
-    /*save the parameter in the file save.txt if the name does not exist return -1*
+int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t start, time_t pause){
+    /*save the parameter in the file save.txt if the name does not exist return -1*/
     char** tab=NULL;
     char vide[20];
     int nbsave=0,flag=0,j=0;
@@ -1313,22 +1305,22 @@ int UpdateSave(Dungeon spacestation,Character j1,char* name,int seed,time_t star
     int* seedtab=NULL;
     Dungeon* spacestationtab=NULL;
 
-    if(SearchSave(name)==-1){
-        return -2;
-    }
-
     fp=fopen("saves.txt","a");
     if(fp==NULL){
         return 2;
     }
-    
+
+    if(SearchSave(name)==-1){
+        return -2;
+    }
+
     
     fclose(fp);
 
     nbsave=getname(tab);
-    spacestationtab=malloc((nbsave)*sizeof(Dungeon));
-    seedtab=malloc((nbsave)*sizeof(int));
-    playertab=malloc((nbsave)*sizeof(Character));
+    spacestationtab=malloc((nbsave-1)*sizeof(Dungeon));
+    seedtab=malloc((nbsave-1)*sizeof(int));
+    playertab=malloc((nbsave-1)*sizeof(Character));
     
     if (spacestationtab == NULL || seedtab == NULL || playertab == NULL){
         return 2;
@@ -1370,7 +1362,7 @@ int UpdateSave(Dungeon spacestation,Character j1,char* name,int seed,time_t star
                 fscanf(fp,"%d",&(spacestationtab[j].rooms[k].n_doors));
 
                 spacestationtab[j].rooms[k].doors = NULL;
-                spacestationtab[j].rooms[k].doors = malloc(sizeof(Door)*spacestationtab[j].rooms[k].n_doors);
+                spacestationtab[j].rooms[k].doors = malloc(sizeof(Door)*(spacestationtab+j)->rooms[k].n_doors);
                 if (spacestationtab[j].rooms[k].doors == NULL){
                     return 2;
                 }
@@ -1392,12 +1384,12 @@ int UpdateSave(Dungeon spacestation,Character j1,char* name,int seed,time_t star
 
     fprintf(fp,"{%s\n",name);
     fprintf(fp,"%d\n",seed);
-    fprintf(fp,"%d\n",j1.x);
-    fprintf(fp,"%d\n",j1.y);
-    fprintf(fp,"%d\n",j1.pv);
-    fprintf(fp,"%d\n",j1.exp);
-    fprintf(fp,"%d\n",j1.tasksDone);
-    fprintf(fp,"%ld\n",start-pause+j1.timer);     //timeBegin-time(NULL)+stats.timer
+    fprintf(fp,"%d\n",player.x);
+    fprintf(fp,"%d\n",player.y);
+    fprintf(fp,"%d\n",player.pv);
+    fprintf(fp,"%d\n",player.exp);
+    fprintf(fp,"%d\n",player.tasksDone);
+    fprintf(fp,"%ld\n",start-pause+player.timer);     //timeBegin-time(NULL)+stats.timer
     fprintf(fp,"%d\n",spacestation.n_tasks);
     fprintf(fp,"%d\n",spacestation.total_rooms);
     fprintf(fp,"%d\n",spacestation.nr_created);
@@ -1457,12 +1449,11 @@ int UpdateSave(Dungeon spacestation,Character j1,char* name,int seed,time_t star
         }
     }
 
-
     fclose(fp);
 
     return 0;
 }
-*/
+
 // Game ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 int Pause(Character stats,char* name, int seed, int tasks, time_t* begin){
@@ -2115,7 +2106,7 @@ int CreateGame(){
             PrintUI(player,"",seed,0,0,1);
             PrintLetters(3);        // Print NAME
             mvprintw(SCREENI+7,SCREENL/2-10,"Enter your name : ");
-            if (((k<91 && k>64)||(k<58 && k>47)||(k<123 && k>96)||(k==95))&&(len<NAMELIMIT)){       // Maj + min + num + _
+            if (((k<91 && k>64)||(k<58 && k>47)||(k<123 && k>96)||(k==95))&&(len<=NAMELIMIT)){       // Maj + min + num + _
                 name[len] = k;
                 len++;
             }
@@ -2124,7 +2115,7 @@ int CreateGame(){
                 len--;
             }
 
-            for (int i=0;i<len+1;i++){            // Print name chosen (stop at character limit)
+            for (int i=0;i<len;i++){            // Print name chosen (stop at character limit)
                 printw("%c", name[i]);
             }
 
@@ -2192,7 +2183,6 @@ int CreateGame(){
         free(spaceStation.rooms[i].doors);
     }
     free(spaceStation.rooms);
-    //free(name);
 
     return error;
 }
@@ -2200,45 +2190,38 @@ int CreateGame(){
 int LoadSave(){
     Dungeon spaceStation;
     Character player;
-    char* name=NULL;
-    int seed=0;
-    char temp_name[NAMELIMIT+1];
-    int k=0,error=0,len=0,confirm=0,cursor=0, retry=1; 
+    char name[NAMELIMIT+1];
+    int k=0,error=0,len=0,confirm=0,cursor=0, retry=1, seed=0; 
     
     while (retry){
         while (!confirm){
+            
+            for (int i=0;i<21;i++){     // Reinitialise the name
+                name[i] = '\0';
+            }
+                    
             do{                 // Ask name so you can see character limit (20)
                 clear();
-                PrintUI(player,"",0,0,0,1);
+                PrintUI(player,"",seed,0,0,1);
                 PrintLetters(3);        // Print NAME
                 mvprintw(SCREENI+7,SCREENL/2-10,"Enter your name : ");
                 if (((k<91 && k>64)||(k<58 && k>47)||(k<123 && k>96)||(k==95))&&(len<NAMELIMIT)){       // Maj + min + num + _
-                    *(temp_name+len) = k;
+                    name[len] = k;
                     len++;
                 }
                 else if ((k==263)&&(len>0)){        // If DEL
-                    *(temp_name+len) = '\0';
+                    name[len] = '\0';
                     len--;
                 }
 
                 for (int i=0;i<len;i++){            // Print name chosen (stop at character limit)
-                    printw("%c", temp_name[i]);
+                    printw("%c", name[i]);
                 }
 
                 refresh();
                 k = getch();
             } while ((k!=10)||(len==0));        // Until you press enter
-
-            name = malloc(sizeof(char)*(len));
-            if (name==NULL){
-                return 2;
-            }
-            
-            for (int i=0;i<len;i++){                // If name chosen, the temp name will transfer to a dynamic string
-            if(((temp_name[i]<91 && temp_name[i]>64)||(temp_name[i]<58 && temp_name[i]>47)||(temp_name[i]<123 && temp_name[i]>96))&&(len<NAMELIMIT)){
-                *(name+i) = temp_name[i];
-            }
-            }
+        
             //error = GetSave(&spaceStation,&player,name,&seed);
 
             if (error == 1){
@@ -2468,10 +2451,9 @@ int main(){
             default:
                 printf("Ceci est un message d'erreur");
                 return 3;
-                break;  // Diffrent error messages
+                break;  // Different error messages
         }
     }
-
 
     return 0;
 }
