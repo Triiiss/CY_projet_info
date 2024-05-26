@@ -1257,7 +1257,7 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
 
     if(SearchSave(name)!=-1){
         fp=fopen("saves.txt","r+");
-        fseek(fp,SearchSave(name),SEEK_SET);
+        fseek(fp,SearchSave(name)+1,SEEK_SET);
         fscanf(fp,"%d",seed);
         fscanf(fp,"%d",&(player->x));
         fscanf(fp,"%d",&(player->y));
@@ -1290,6 +1290,12 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
         fscanf(fp,"%d",&(spacestation->nr_created));
         fscanf(fp,"%d",&(spacestation->nd_left));
 
+        spacestation->rooms = NULL;
+        spacestation->rooms = malloc(spacestation->nr_created*sizeof(Room));
+        if(spacestation->rooms == NULL){
+            return 2;
+        }
+
         for (int i=0;i<spacestation->nr_created;i++){
             fscanf(fp,"%d",&(spacestation->rooms[i].x));
             fscanf(fp,"%d",&(spacestation->rooms[i].y));
@@ -1313,6 +1319,13 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
             fscanf(fp,"%d",&(spacestation->rooms[i].weapon.icon));
 
             fscanf(fp,"%d",&(spacestation->rooms[i].n_doors));
+
+            spacestation->rooms[i].doors = NULL;
+            spacestation->rooms[i].doors = malloc(spacestation->rooms[i].n_doors*sizeof(Room));
+            if(spacestation->rooms[i].doors == NULL){
+                return 2;
+            }
+            
             for (int j=0;j<spacestation->rooms[i].n_doors;j++){
                 fscanf(fp,"%d",&(spacestation->rooms[i].doors[j].x));
                 fscanf(fp,"%d",&(spacestation->rooms[i].doors[j].y));
@@ -2367,7 +2380,6 @@ int LoadSave(){
     
     while (retry){
         while (!confirm){
-            
             for (int i=0;i<21;i++){     // Reinitialise the name
                 name[i] = '\0';
             }
@@ -2562,11 +2574,11 @@ int TitleScreen(){
                             break;
                         case 1:                         // Load save
                             error = LoadSave();
-                            if(error == 1){
+                            if(error == 0){
                                 endwin();
                                 return 0;
                             }
-                            if (error != 0){
+                            if (error != 1){
                                 return error;
                             }
                             break;
