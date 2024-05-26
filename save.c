@@ -203,7 +203,7 @@ int GetSave(Dungeon* spacestation, Character* player, char* name, int* seed){
         fscanf(fp,"%d",&(spacestation->nd_left));
 
         spacestation->rooms = NULL;
-        spacestation->rooms = malloc(spacestation->nr_created*sizeof(Room));
+        spacestation->rooms = malloc(spacestation->total_rooms*sizeof(Room));
         if(spacestation->rooms == NULL){
             return 2;
         }
