@@ -15,7 +15,7 @@ game.o: game.c main.h
 main.o: game.c main.h
 	gcc -c main.c -o main.o -lncursesw
 
-exec: rooms.o display.o save.o game.o main.o main.h
+cy_yonder: rooms.o display.o save.o game.o main.o main.h
 	gcc rooms.o display.o save.o game.o main.o -lncursesw -o cy_yonder
 
 clean:
