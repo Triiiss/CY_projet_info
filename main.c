@@ -25,7 +25,7 @@
 #define BARPV 20
 
 typedef struct{
-    char icon;
+    int icon;
     int x;
     int y;
     int pickup;
@@ -37,7 +37,7 @@ typedef struct{
     int heal;
     int x;
     int y;
-    char icon;
+    int icon;
     int pickup;
 }Object;
 
@@ -212,12 +212,18 @@ Dungeon FirstRoom(int seed){
     spaceStation.rooms->tasks.x = 0;            // No tasks, object or weapons in the first room
     spaceStation.rooms->tasks.y = 0;
     spaceStation.rooms->tasks.done = 1;
+
     spaceStation.rooms->object.x = 0;
     spaceStation.rooms->object.y = 0;
     spaceStation.rooms->object.pickup = 1;
+    spaceStation.rooms->object.exp = 0;
+    spaceStation.rooms->object.heal = 0;
+    spaceStation.rooms->object.icon = -1;
     spaceStation.rooms->weapon.x = 0;
     spaceStation.rooms->weapon.y = 0;
     spaceStation.rooms->weapon.pickup = 1;
+    spaceStation.rooms->weapon.damage = 0;
+    spaceStation.rooms->weapon.icon = -1;
 
     spaceStation.rooms->n_doors = 4;
 
@@ -706,21 +712,19 @@ int NewRoom(int seed, Dungeon* spaceStation, Door* door){
         spaceStation->rooms[spaceStation->nr_created].object.y = Rand(seed,78,spaceStation->nr_created*44)%(spaceStation->rooms[spaceStation->nr_created].H-2)+1+spaceStation->rooms[spaceStation->nr_created].y;
         spaceStation->rooms[spaceStation->nr_created].object.pickup = 0;
 
+        spaceStation->rooms[spaceStation->nr_created].object.icon = Rand(seed,712,spaceStation->nr_created*5)%3;
         switch(Rand(seed,712,spaceStation->nr_created*5)%3){
             case 0:         // Potion heal
                 spaceStation->rooms[spaceStation->nr_created].object.exp = Rand(seed,115,spaceStation->nr_created)%50+50;
                 spaceStation->rooms[spaceStation->nr_created].object.heal = 25;
-                spaceStation->rooms[spaceStation->nr_created].object.icon = 'h';
                 break;
             case 1:         // Potion strengh
                 spaceStation->rooms[spaceStation->nr_created].object.exp = Rand(seed,242,spaceStation->nr_created)%50+50;
                 spaceStation->rooms[spaceStation->nr_created].object.heal = 10;
-                spaceStation->rooms[spaceStation->nr_created].object.icon = 's';
                 break;
             case 2:         // Book (for exp)
                 spaceStation->rooms[spaceStation->nr_created].object.exp = Rand(seed,spaceStation->nr_created*8,14)%100+250;
                 spaceStation->rooms[spaceStation->nr_created].object.heal = 0;
-                spaceStation->rooms[spaceStation->nr_created].object.icon = 'b';
                 break;
         }
     }
@@ -729,7 +733,7 @@ int NewRoom(int seed, Dungeon* spaceStation, Door* door){
         spaceStation->rooms[spaceStation->nr_created].object.y = 0;
         spaceStation->rooms[spaceStation->nr_created].object.heal = 0;
         spaceStation->rooms[spaceStation->nr_created].object.exp = 0;
-        spaceStation->rooms[spaceStation->nr_created].object.icon = '.';
+        spaceStation->rooms[spaceStation->nr_created].object.icon = -1;
         spaceStation->rooms[spaceStation->nr_created].object.pickup = 1;
     }
 
@@ -740,18 +744,18 @@ int NewRoom(int seed, Dungeon* spaceStation, Door* door){
 
         if (Rand(seed,85,spaceStation->nr_created*56)%5 == 0 || Rand(seed,85,spaceStation->nr_created*56)%5 == 1){         // Swords
             spaceStation->rooms[spaceStation->nr_created].weapon.damage = 45;
-            spaceStation->rooms[spaceStation->nr_created].weapon.icon = 's';
+            spaceStation->rooms[spaceStation->nr_created].weapon.icon = 0;
         }
         else{         // hammer
             spaceStation->rooms[spaceStation->nr_created].weapon.damage = 10;
-            spaceStation->rooms[spaceStation->nr_created].weapon.icon = 'h';
+            spaceStation->rooms[spaceStation->nr_created].weapon.icon = 1;
         }
     }
     else{           // No weapons here
         spaceStation->rooms[spaceStation->nr_created].weapon.x = 0;
         spaceStation->rooms[spaceStation->nr_created].weapon.y = 0;
         spaceStation->rooms[spaceStation->nr_created].weapon.damage = 0;
-        spaceStation->rooms[spaceStation->nr_created].weapon.icon = '.';
+        spaceStation->rooms[spaceStation->nr_created].weapon.icon = -1;
         spaceStation->rooms[spaceStation->nr_created].weapon.pickup = 1;
     }
     spaceStation->nr_created++;
@@ -902,13 +906,13 @@ int PrintMap(Dungeon spaceStation, Character player){
         if ((spaceStation.rooms[i].object.x != 0 || spaceStation.rooms[i].object.y != 0) && spaceStation.rooms[i].object.pickup == 0){      // If there is a non-picked up object
             if ((spaceStation.rooms[i].object.x - player.x < SCREENL/2 && spaceStation.rooms[i].object.x - player.x > -SCREENL/2)&&(spaceStation.rooms[i].object.y - player.y < (SCREENH-SCREENI)/2 && spaceStation.rooms[i].object.y - player.y > -(SCREENH-SCREENI)/2)){
                 switch(spaceStation.rooms[i].object.icon){
-                    case 'h':
+                    case 0:
                         mvprintw(player.y-spaceStation.rooms[i].object.y + (SCREENH-SCREENI)/2 + SCREENI,spaceStation.rooms[i].object.x - player.x+SCREENL/2,"✚");
                         break;
-                    case 'b':
+                    case 2:
                         mvprintw(player.y-spaceStation.rooms[i].object.y + (SCREENH-SCREENI)/2 + SCREENI,spaceStation.rooms[i].object.x - player.x+SCREENL/2,"🕮");
                         break;
-                    case 's':
+                    case 1:
                         mvprintw(player.y-spaceStation.rooms[i].object.y + (SCREENH-SCREENI)/2 + SCREENI,spaceStation.rooms[i].object.x - player.x+SCREENL/2,"⚗");
                         break;
                 }
@@ -918,10 +922,10 @@ int PrintMap(Dungeon spaceStation, Character player){
         if ((spaceStation.rooms[i].weapon.x != 0 || spaceStation.rooms[i].weapon.y != 0) && spaceStation.rooms[i].weapon.pickup == 0){      // If there is a non-picked up weapon
             if ((spaceStation.rooms[i].weapon.x - player.x < SCREENL/2 && spaceStation.rooms[i].weapon.x - player.x > -SCREENL/2)&&(spaceStation.rooms[i].weapon.y - player.y < (SCREENH-SCREENI)/2 && spaceStation.rooms[i].weapon.y - player.y > -(SCREENH-SCREENI)/2)){
                 switch(spaceStation.rooms[i].weapon.icon){
-                    case 's':
+                    case 0:
                         mvprintw(player.y-spaceStation.rooms[i].weapon.y + (SCREENH-SCREENI)/2 + SCREENI,spaceStation.rooms[i].weapon.x - player.x+SCREENL/2,"⚔");
                         break;
-                    case 'h':
+                    case 1:
                         mvprintw(player.y-spaceStation.rooms[i].weapon.y + (SCREENH-SCREENI)/2 + SCREENI,spaceStation.rooms[i].weapon.x - player.x+SCREENL/2,"⚒");
                         break;
                 }
@@ -961,10 +965,10 @@ int PrintUI(Character stats, char* name,int seed,  int tasks, time_t timeBegin, 
             mvprintw(4,SCREENL/5*3,"Tasks: %d/%d",stats.tasksDone,tasks);
             mvprintw(2,SCREENL/5*3,"Obj:");
             if (stats.hold != -1){
-                if (stats.bag.weaponPouch[stats.hold].icon == 'h'){
+                if (stats.bag.weaponPouch[stats.hold].icon == 1){
                     mvprintw(2,SCREENL/5*3,"Obj: R. Tools");
                 }
-                else if (stats.bag.weaponPouch[stats.hold].icon == 's'){
+                else if (stats.bag.weaponPouch[stats.hold].icon == 0){
                     mvprintw(2,SCREENL/5*3,"Obj: L. Sword");
                 }
             } 
@@ -1034,13 +1038,13 @@ void PrintInventory(Character* player,char* name,int seed, int tasks, time_t *be
     for (int i=0;i<4;i++){      // Objects
         if (player->bag.use_pouch[i].pickup == 1){
             switch(player->bag.use_pouch[i].icon){
-                case 's':
+                case 1:
                     mvprintw(SCREENI+10+i*2,SCREENL/2+3,"▢  Strenght potion     ⚗");
                     break;
-                case 'b':
+                case 2:
                     mvprintw(SCREENI+10+i*2,SCREENL/2+3,"▢  Book of knowledge   🕮");
                     break;
-                case 'h':
+                case 0:
                     mvprintw(SCREENI+10+i*2,SCREENL/2+3,"▢  Healing potion      ✚");
                     break;
             }
@@ -1052,10 +1056,10 @@ void PrintInventory(Character* player,char* name,int seed, int tasks, time_t *be
     for (int i=0;i<2;i++){      // Weapons
         if (player->bag.weaponPouch[i].pickup == 1){
             switch(player->bag.weaponPouch[i].icon){
-                case 'h':
+                case 1:
                     mvprintw(SCREENI+10+i*4,3,"▢  Reparing tools  ⚒");
                     break;
-                case 's':
+                case 0:
                     mvprintw(SCREENI+10+i*4,3,"▢  Laser Sword     ⚔");
                     break;
             }
@@ -1106,7 +1110,6 @@ int NewSave(Dungeon spacestation, Character player,char* name,int seed,time_t ti
         return 2;
     }
     fseek(fp, 0, SEEK_END);
-
         fprintf(fp,"{%s\n",name);
         fprintf(fp,"%d\n",seed);
         fprintf(fp,"%d\n",player.x);
@@ -1114,10 +1117,28 @@ int NewSave(Dungeon spacestation, Character player,char* name,int seed,time_t ti
         fprintf(fp,"%d\n",player.pv);
         fprintf(fp,"%d\n",player.exp);
         fprintf(fp,"%d\n",player.tasksDone);
+        fprintf(fp,"%d\n",player.damage);
+        fprintf(fp,"%d\n",player.hold);
+        for (int i=0;i<4;i++){
+            fprintf(fp,"%d\n",player.bag.use_pouch[i].x);
+            fprintf(fp,"%d\n",player.bag.use_pouch[i].y);
+            fprintf(fp,"%d\n",player.bag.use_pouch[i].pickup);
+            fprintf(fp,"%d\n",player.bag.use_pouch[i].exp);
+            fprintf(fp,"%d\n",player.bag.use_pouch[i].heal);
+            fprintf(fp,"%d\n",player.bag.use_pouch[i].icon);
+        }
+        for (int i=0;i<2;i++){
+            fprintf(fp,"%d\n",player.bag.weaponPouch[i].x);
+            fprintf(fp,"%d\n",player.bag.weaponPouch[i].y);
+            fprintf(fp,"%d\n",player.bag.weaponPouch[i].pickup);
+            fprintf(fp,"%d\n",player.bag.weaponPouch[i].damage);
+            fprintf(fp,"%d\n",player.bag.weaponPouch[i].icon);
+        }
 
         fprintf(fp,"%ld\n",timer-time(NULL)+player.timer);
 
         fprintf(fp,"%d\n",spacestation.n_tasks);
+        fprintf(fp,"%d\n",spacestation.n_tasks2create);
         fprintf(fp,"%d\n",spacestation.total_rooms);
         fprintf(fp,"%d\n",spacestation.nr_created);
         fprintf(fp,"%d\n",spacestation.nd_left);
@@ -1131,6 +1152,19 @@ int NewSave(Dungeon spacestation, Character player,char* name,int seed,time_t ti
             fprintf(fp,"%d\n",spacestation.rooms[i].tasks.y);
             fprintf(fp,"%d\n",spacestation.rooms[i].tasks.done);
 
+            fprintf(fp,"%d\n",spacestation.rooms[i].object.x);
+            fprintf(fp,"%d\n",spacestation.rooms[i].object.y);
+            fprintf(fp,"%d\n",spacestation.rooms[i].object.pickup);
+            fprintf(fp,"%d\n",spacestation.rooms[i].object.exp);
+            fprintf(fp,"%d\n",spacestation.rooms[i].object.heal);
+            fprintf(fp,"%d\n",spacestation.rooms[i].object.icon);
+
+            fprintf(fp,"%d\n",spacestation.rooms[i].weapon.x);
+            fprintf(fp,"%d\n",spacestation.rooms[i].weapon.y);
+            fprintf(fp,"%d\n",spacestation.rooms[i].weapon.pickup);
+            fprintf(fp,"%d\n",spacestation.rooms[i].weapon.damage);
+            fprintf(fp,"%d\n",spacestation.rooms[i].weapon.icon);
+
             fprintf(fp,"%d\n",spacestation.rooms[i].n_doors);
             for (int j=0;j<spacestation.rooms[i].n_doors;j++){
                 fprintf(fp,"%d\n",spacestation.rooms[i].doors[j].x);
@@ -1142,9 +1176,6 @@ int NewSave(Dungeon spacestation, Character player,char* name,int seed,time_t ti
         fprintf(fp,"}\n");
         fclose(fp);
         return 0;
-    fclose(fp);
-
-    return -2;
 }
 
 int SavingChoice(Character player, char* name,int seed,  int tasks, time_t* timeBegin){
@@ -1196,6 +1227,8 @@ int SearchSave(char* name){
     int size=0;
     size=strlen(name);
     char c=0;
+    fp= fopen("saves.txt","a");
+    fclose(fp);
     fp=fopen("saves.txt","r");
     if (fp == NULL){
         return 2;
@@ -1225,17 +1258,34 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
     if(SearchSave(name)!=-1){
         fp=fopen("saves.txt","r+");
         fseek(fp,SearchSave(name),SEEK_SET);
-        fscanf(fp,"%s",name);
         fscanf(fp,"%d",seed);
         fscanf(fp,"%d",&(player->x));
         fscanf(fp,"%d",&(player->y));
         fscanf(fp,"%d",&(player->pv));
         fscanf(fp,"%d",&(player->exp));
         fscanf(fp,"%d",&(player->tasksDone));
+        fscanf(fp,"%d",&(player->damage));
+        fscanf(fp,"%d",&(player->hold));
+        for (int i=0;i<4;i++){
+            fscanf(fp,"%d",&(player->bag.use_pouch[i].x));
+            fscanf(fp,"%d",&(player->bag.use_pouch[i].y));
+            fscanf(fp,"%d",&(player->bag.use_pouch[i].pickup));
+            fscanf(fp,"%d",&(player->bag.use_pouch[i].exp));
+            fscanf(fp,"%d",&(player->bag.use_pouch[i].heal));
+            fscanf(fp,"%d",&(player->bag.use_pouch[i].icon));
+        }
+        for (int i=0;i<2;i++){
+            fscanf(fp,"%d",&(player->bag.weaponPouch[i].x));
+            fscanf(fp,"%d",&(player->bag.weaponPouch[i].y));
+            fscanf(fp,"%d",&(player->bag.weaponPouch[i].pickup));
+            fscanf(fp,"%d",&(player->bag.weaponPouch[i].damage));
+            fscanf(fp,"%d",&(player->bag.weaponPouch[i].icon));
+        }
 
         fscanf(fp,"%d",&(player->timer));
 
         fscanf(fp,"%d",&(spacestation->n_tasks));
+        fscanf(fp,"%d",&(spacestation->n_tasks2create));
         fscanf(fp,"%d",&(spacestation->total_rooms));
         fscanf(fp,"%d",&(spacestation->nr_created));
         fscanf(fp,"%d",&(spacestation->nd_left));
@@ -1248,6 +1298,20 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
             fscanf(fp,"%d",&(spacestation->rooms[i].tasks.x));
             fscanf(fp,"%d",&(spacestation->rooms[i].tasks.y));
             fscanf(fp,"%d",&(spacestation->rooms[i].tasks.done));
+
+            fscanf(fp,"%d",&(spacestation->rooms[i].object.x));
+            fscanf(fp,"%d",&(spacestation->rooms[i].object.y));
+            fscanf(fp,"%d",&(spacestation->rooms[i].object.pickup));
+            fscanf(fp,"%d",&(spacestation->rooms[i].object.exp));
+            fscanf(fp,"%d",&(spacestation->rooms[i].object.heal));
+            fscanf(fp,"%d",&(spacestation->rooms[i].object.icon));
+            
+            fscanf(fp,"%d",&(spacestation->rooms[i].weapon.x));
+            fscanf(fp,"%d",&(spacestation->rooms[i].weapon.y));
+            fscanf(fp,"%d",&(spacestation->rooms[i].weapon.pickup));
+            fscanf(fp,"%d",&(spacestation->rooms[i].weapon.damage));
+            fscanf(fp,"%d",&(spacestation->rooms[i].weapon.icon));
+
             fscanf(fp,"%d",&(spacestation->rooms[i].n_doors));
             for (int j=0;j<spacestation->rooms[i].n_doors;j++){
                 fscanf(fp,"%d",&(spacestation->rooms[i].doors[j].x));
@@ -1262,48 +1326,54 @@ int GetSave(Dungeon* spacestation,Character* player,char* name,int* seed){
     return -1;
 }
 
-int getname(char** tab){
-    FILE* fp;
-    char c;
+int getname(char ** tab){
+    FILE* fp=NULL;
+    char c=0;
     char* nom;
     int size=0;
-    int indice;
-    fp=fopen("saves.txt","r");
-    c=fgetc(fp);
-    while(c!=EOF){
-        if(c=='{'){
-            c=fgetc(fp);
-            nom=malloc(21*sizeof(char));
-            indice=0;
-            do{
-                nom[indice]=c;
-                indice++;
-                c=fgetc(fp);    
-            }while(c!='\n');
-            tab[size]=nom;
-            size++;
-        }
+    int indice=0;
 
+    fp=fopen("saves.txt","r");
         c=fgetc(fp);
-    }
+        while(c!=EOF){
+            if(c=='{'){
+                (nom) = malloc(sizeof(char)*(NAMELIMIT+1));
+
+                for (int i=0;i<NAMELIMIT;i++){        // Initialise the name
+                    nom[i] = '\0';
+                }
+
+                c=fgetc(fp);
+                indice=0;
+                do{
+                    nom[indice]=c;
+                    indice++;
+                    c=fgetc(fp);
+                }while(c!='\n');
+                (tab[size]) = nom;
+                size++;
+            }
+
+            c=fgetc(fp);
+        }
     fclose(fp);
     return size;
 }
 
 int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t start, time_t pause){
     /*save the parameter in the file save.txt if the name does not exist return -1*/
-    char** tab=NULL;
+    char** tab;
     char vide[20];
     int nbsave=0,flag=0,j=0;
+    FILE* fp=NULL;
+    Character* playertab=NULL;
+    int* seedtab=NULL;
+    Dungeon* spacestationtab=NULL;
 
     tab=malloc(4*sizeof(char*));
     for(int i=0;i<4;i++){
         tab[i]=NULL;
     }
-    FILE* fp=NULL;
-    Character* playertab=NULL;
-    int* seedtab=NULL;
-    Dungeon* spacestationtab=NULL;
 
     fp=fopen("saves.txt","a");
     if(fp==NULL){
@@ -1313,8 +1383,6 @@ int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t 
     if(SearchSave(name)==-1){
         return -2;
     }
-
-    
     fclose(fp);
 
     nbsave=getname(tab);
@@ -1328,19 +1396,37 @@ int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t 
 
     fp=fopen("saves.txt","r");
 
-    int c=0;
     for(int i=0;i<nbsave;i++){
-        if(strequal(tab[i],name)!=1){
-            fseek(fp,SearchSave(tab[i])+1,SEEK_CUR);
+        if(strequal(tab[i],name) != 1){
+            fseek(fp,SearchSave(tab[i])+1,SEEK_SET);
             fscanf(fp,"%d",&(seedtab[j]));
             fscanf(fp,"%d",&(playertab[j].x));
             fscanf(fp,"%d",&(playertab[j].y));
             fscanf(fp,"%d",&(playertab[j].pv));
             fscanf(fp,"%d",&(playertab[j].exp));
             fscanf(fp,"%d",&(playertab[j].tasksDone));
+            fscanf(fp,"%d",&(playertab[j].damage));
+            fscanf(fp,"%d",&(playertab[j].hold));
+            for (int k=0;k<4;k++){
+                fscanf(fp,"%d",&(playertab[j].bag.use_pouch[k].x));
+                fscanf(fp,"%d",&(playertab[j].bag.use_pouch[k].y));
+                fscanf(fp,"%d",&(playertab[j].bag.use_pouch[k].pickup));
+                fscanf(fp,"%d",&(playertab[j].bag.use_pouch[k].exp));
+                fscanf(fp,"%d",&(playertab[j].bag.use_pouch[k].heal));
+                fscanf(fp,"%d",&(playertab[j].bag.use_pouch[k].icon));
+            }
+            for (int k=0;k<2;k++){
+                fscanf(fp,"%d",&(playertab[j].bag.weaponPouch[k].x));
+                fscanf(fp,"%d",&(playertab[j].bag.weaponPouch[k].y));
+                fscanf(fp,"%d",&(playertab[j].bag.weaponPouch[k].pickup));
+                fscanf(fp,"%d",&(playertab[j].bag.weaponPouch[k].damage));
+                fscanf(fp,"%d",&(playertab[j].bag.weaponPouch[k].icon));
+            }
+
             fscanf(fp,"%d",&(playertab[j].timer));
 
             fscanf(fp,"%d",&(spacestationtab[j].n_tasks));
+            fscanf(fp,"%d",&(spacestationtab[j].n_tasks2create));
             fscanf(fp,"%d",&(spacestationtab[j].total_rooms));
             fscanf(fp,"%d",&(spacestationtab[j].nr_created));
             fscanf(fp,"%d",&(spacestationtab[j].nd_left));
@@ -1359,6 +1445,20 @@ int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t 
                 fscanf(fp,"%d",&(spacestationtab[j].rooms[k].tasks.x));
                 fscanf(fp,"%d",&(spacestationtab[j].rooms[k].tasks.y));
                 fscanf(fp,"%d",&(spacestationtab[j].rooms[k].tasks.done));
+
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].object.x));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].object.y));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].object.pickup));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].object.exp));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].object.heal));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].object.icon));
+
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].weapon.x));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].weapon.y));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].weapon.pickup));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].weapon.damage));
+                fscanf(fp,"%d",&(spacestationtab[j].rooms[k].weapon.icon));
+
                 fscanf(fp,"%d",&(spacestationtab[j].rooms[k].n_doors));
 
                 spacestationtab[j].rooms[k].doors = NULL;
@@ -1389,8 +1489,26 @@ int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t 
     fprintf(fp,"%d\n",player.pv);
     fprintf(fp,"%d\n",player.exp);
     fprintf(fp,"%d\n",player.tasksDone);
+    fprintf(fp,"%d\n",player.damage);
+    fprintf(fp,"%d\n",player.hold);
+    for (int i=0;i<4;i++){
+        fprintf(fp,"%d\n",player.bag.use_pouch[i].x);
+        fprintf(fp,"%d\n",player.bag.use_pouch[i].y);
+        fprintf(fp,"%d\n",player.bag.use_pouch[i].pickup);
+        fprintf(fp,"%d\n",player.bag.use_pouch[i].exp);
+        fprintf(fp,"%d\n",player.bag.use_pouch[i].heal);
+        fprintf(fp,"%d\n",player.bag.use_pouch[i].icon);
+    }
+    for (int i=0;i<2;i++){
+        fprintf(fp,"%d\n",player.bag.weaponPouch[i].x);
+        fprintf(fp,"%d\n",player.bag.weaponPouch[i].y);
+        fprintf(fp,"%d\n",player.bag.weaponPouch[i].pickup);
+        fprintf(fp,"%d\n",player.bag.weaponPouch[i].damage);
+        fprintf(fp,"%d\n",player.bag.weaponPouch[i].icon);
+    }
     fprintf(fp,"%ld\n",start-pause+player.timer);     //timeBegin-time(NULL)+stats.timer
     fprintf(fp,"%d\n",spacestation.n_tasks);
+    fprintf(fp,"%d\n",spacestation.n_tasks2create);
     fprintf(fp,"%d\n",spacestation.total_rooms);
     fprintf(fp,"%d\n",spacestation.nr_created);
     fprintf(fp,"%d\n",spacestation.nd_left);
@@ -1403,7 +1521,22 @@ int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t 
         fprintf(fp,"%d\n",spacestation.rooms[i].tasks.x);
         fprintf(fp,"%d\n",spacestation.rooms[i].tasks.y);
         fprintf(fp,"%d\n",spacestation.rooms[i].tasks.done);
+
+        fprintf(fp,"%d\n",spacestation.rooms[i].object.x);
+        fprintf(fp,"%d\n",spacestation.rooms[i].object.y);
+        fprintf(fp,"%d\n",spacestation.rooms[i].object.pickup);
+        fprintf(fp,"%d\n",spacestation.rooms[i].object.exp);
+        fprintf(fp,"%d\n",spacestation.rooms[i].object.heal);
+        fprintf(fp,"%d\n",spacestation.rooms[i].object.icon);
+
+        fprintf(fp,"%d\n",spacestation.rooms[i].weapon.x);
+        fprintf(fp,"%d\n",spacestation.rooms[i].weapon.y);
+        fprintf(fp,"%d\n",spacestation.rooms[i].weapon.pickup);
+        fprintf(fp,"%d\n",spacestation.rooms[i].weapon.damage);
+        fprintf(fp,"%d\n",spacestation.rooms[i].weapon.icon);
+
         fprintf(fp,"%d\n",spacestation.rooms[i].n_doors);
+
         for (int j=0;j<spacestation.rooms[i].n_doors;j++){
             fprintf(fp,"%d\n",spacestation.rooms[i].doors[j].x);
             fprintf(fp,"%d\n",spacestation.rooms[i].doors[j].y);
@@ -1413,39 +1546,74 @@ int UpdateSave(Dungeon spacestation,Character player,char* name,int seed,time_t 
     }
     fprintf(fp,"}\n");
 
+    j=0;
     for(int i=0;i<nbsave;i++){
         if(strequal(tab[i],name)!=1){
             fprintf(fp,"{%s\n",*(tab+i));
-            fprintf(fp,"%d\n",*(seedtab+i));
-            fprintf(fp,"%d\n",((playertab+i)->x));
-            fprintf(fp,"%d\n",((playertab+i)->y));
-            fprintf(fp,"%d\n",((playertab+i)->pv));
-            fprintf(fp,"%d\n",((playertab+i)->exp));
-            fprintf(fp,"%d\n",((playertab+i)->tasksDone));
-            fprintf(fp,"%d\n",((playertab+i)->timer));
+            fprintf(fp,"%d\n",*(seedtab+j));
+            fprintf(fp,"%d\n",((playertab+j)->x));
+            fprintf(fp,"%d\n",((playertab+j)->y));
+            fprintf(fp,"%d\n",((playertab+j)->pv));
+            fprintf(fp,"%d\n",((playertab+j)->exp));
+            fprintf(fp,"%d\n",((playertab+j)->tasksDone));
+            fprintf(fp,"%d\n",(playertab+j)->damage);
+            fprintf(fp,"%d\n",(playertab+j)->hold);
+            for (int k=0;k<4;k++){
+                fprintf(fp,"%d\n",(playertab+j)->bag.use_pouch[k].x);
+                fprintf(fp,"%d\n",(playertab+j)->bag.use_pouch[k].y);
+                fprintf(fp,"%d\n",(playertab+j)->bag.use_pouch[k].pickup);
+                fprintf(fp,"%d\n",(playertab+j)->bag.use_pouch[k].exp);
+                fprintf(fp,"%d\n",(playertab+j)->bag.use_pouch[k].heal);
+                fprintf(fp,"%d\n",(playertab+j)->bag.use_pouch[k].icon);
+            }
+            for (int k=0;k<2;k++){
+                fprintf(fp,"%d\n",(playertab+j)->bag.weaponPouch[k].x);
+                fprintf(fp,"%d\n",(playertab+j)->bag.weaponPouch[k].y);
+                fprintf(fp,"%d\n",(playertab+j)->bag.weaponPouch[k].pickup);
+                fprintf(fp,"%d\n",(playertab+j)->bag.weaponPouch[k].damage);
+                fprintf(fp,"%d\n",(playertab+j)->bag.weaponPouch[k].icon);
+            }
+            fprintf(fp,"%d\n",((playertab+j)->timer));
 
-            fprintf(fp,"%d\n",((spacestationtab+i)->n_tasks));
-            fprintf(fp,"%d\n",((spacestationtab+i)->total_rooms));
-            fprintf(fp,"%d\n",((spacestationtab+i)->nr_created));
-            fprintf(fp,"%d\n",((spacestationtab+i)->nd_left));
+            fprintf(fp,"%d\n",((spacestationtab+j)->n_tasks));
+            fprintf(fp,"%d\n",(spacestationtab+j)->n_tasks2create);
+            fprintf(fp,"%d\n",((spacestationtab+j)->total_rooms));
+            fprintf(fp,"%d\n",((spacestationtab+j)->nr_created));
+            fprintf(fp,"%d\n",((spacestationtab+j)->nd_left));
 
-            for (int j=0;j<(spacestationtab+i)->nr_created;j++){
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].x));
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].y));
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].H));
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].L));
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].tasks.x));
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].tasks.y));
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].tasks.done));
-                fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].n_doors));
-                for (int k=0;k<(spacestationtab+i)->rooms[j].n_doors;k++){
-                    fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].doors[k].x));
-                    fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].doors[k].y));
-                    fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].doors[k].wall));
-                    fprintf(fp,"%d\n",((spacestationtab+i)->rooms[j].doors[k].open));
+            for (int k=0;k<(spacestationtab+j)->nr_created;k++){
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].x));
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].y));
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].H));
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].L));
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].tasks.x));
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].tasks.y));
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].tasks.done));
+
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].object.x);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].object.y);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].object.pickup);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].object.exp);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].object.heal);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].object.icon);
+                
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].weapon.x);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].weapon.y);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].weapon.pickup);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].weapon.damage);
+                fprintf(fp,"%d\n",(spacestationtab+j)->rooms[k].weapon.icon);
+
+                fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].n_doors));
+
+                for (int l=0;l<(spacestationtab+j)->rooms[k].n_doors;l++){
+                    fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].doors[l].x));
+                    fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].doors[l].y));
+                    fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].doors[l].wall));
+                    fprintf(fp,"%d\n",((spacestationtab+j)->rooms[k].doors[l].open));
                 }
             }
             fprintf(fp,"}\n");
+            j++;
         }
     }
 
@@ -1588,7 +1756,7 @@ int Inventory(Character* player,char* name,int seed, int tasks, time_t *begin){
                                         case 0:         // Drop
                                             player->bag.use_pouch[cursorobj-1].exp = 0;
                                             player->bag.use_pouch[cursorobj-1].heal = 0;
-                                            player->bag.use_pouch[cursorobj-1].icon = ' ';
+                                            player->bag.use_pouch[cursorobj-1].icon = -1;
                                             player->bag.use_pouch[cursorobj-1].x = 0;
                                             player->bag.use_pouch[cursorobj-1].y = 0;
                                             player->bag.use_pouch[cursorobj-1].pickup = 0;
@@ -1599,16 +1767,16 @@ int Inventory(Character* player,char* name,int seed, int tasks, time_t *begin){
                                         case 1:         //Gives info about the object
                                             mvprintw(SCREENH-6,SCREENL/4*3,"Info:");
                                             switch(player->bag.use_pouch[cursorobj-1].icon){
-                                                case 's':
+                                                case 1:
                                                     mvprintw(SCREENH-4,SCREENL/4*3-10,"Potion of Strengh : Makes you able");
                                                     mvprintw(SCREENH-3,SCREENL/4*3-10,"to deal more damage.");
                                                     break;
-                                                case 'h':
+                                                case 0:
                                                     mvprintw(SCREENH-4,SCREENL/4*3-10,"Healing potion : ");
                                                     mvprintw(SCREENH-3,SCREENL/4*3-10,"Gives you %d health",player->bag.use_pouch[cursorobj -1].heal);
                                                     mvprintw(SCREENH-2,SCREENL/4*3-10,"(not more than your maximum)");
                                                     break;
-                                                case 'b':
+                                                case 2:
                                                     mvprintw(SCREENH-4,SCREENL/4*3-10,"Book of knowledge : ");
                                                     mvprintw(SCREENH-3,SCREENL/4*3-10,"Gives you more experience");
                                                     break;
@@ -1616,25 +1784,25 @@ int Inventory(Character* player,char* name,int seed, int tasks, time_t *begin){
                                             break;
                                         case 2:     // Use it
                                             switch(player->bag.use_pouch[cursorobj-1].icon){
-                                                case 's':
+                                                case 1:
                                                     player->damage += player->bag.use_pouch[cursorobj-1].heal;
                                                     mvprintw(SCREENH+2,0,"You gained %d of strenght",player->bag.use_pouch[cursorobj-1].heal);
                                                     break;
-                                                case 'h':
+                                                case 0:
                                                     player->pv += player->bag.use_pouch[cursorobj-1].heal;
                                                     if (player->pv>MAXPV){
                                                         player->pv = 100;
                                                     }
                                                     mvprintw(SCREENH+2,0,"You gained %d health points",player->bag.use_pouch[cursorobj-1].heal);
                                                     break;
-                                                case 'b':
+                                                case 2:
                                                     player->exp += player->bag.use_pouch[cursorobj-1].exp;
                                                     mvprintw(SCREENH+2,0,"You gained %d experience points",player->bag.use_pouch[cursorobj-1].exp);
                                                     break;
                                             }
                                             player->bag.use_pouch[cursorobj-1].exp = 0;     // Erase it from your bag
                                             player->bag.use_pouch[cursorobj-1].heal = 0;
-                                            player->bag.use_pouch[cursorobj-1].icon = ' ';
+                                            player->bag.use_pouch[cursorobj-1].icon = -1;
                                             player->bag.use_pouch[cursorobj-1].x = 0;
                                             player->bag.use_pouch[cursorobj-1].y = 0;
                                             player->bag.use_pouch[cursorobj-1].pickup = 0;
@@ -1686,7 +1854,7 @@ int Inventory(Character* player,char* name,int seed, int tasks, time_t *begin){
                                                 player->bag.weaponPouch[-cursorobj-1].y = 0;
                                                 player->bag.weaponPouch[-cursorobj-1].pickup = 0;
                                                 player->bag.weaponPouch[-cursorobj-1].damage = 0;
-                                                player->bag.weaponPouch[-cursorobj-1].icon = ' ';
+                                                player->bag.weaponPouch[-cursorobj-1].icon = -1;
                                                 mvprintw(SCREENH+2,0,"You dropped an object");
                                             }
                                             refresh();
@@ -1695,12 +1863,12 @@ int Inventory(Character* player,char* name,int seed, int tasks, time_t *begin){
                                         case 1:         // Gives info
                                             mvprintw(SCREENH-6,SCREENL/4-10,"Info:");
                                             switch(player->bag.weaponPouch[-cursorobj-1].icon){
-                                                case 's':
+                                                case 0:
                                                     mvprintw(SCREENH-4,SCREENL/4-10,"Laser Sword : A great weapon");
                                                     mvprintw(SCREENH-3,SCREENL/4-10,"for a great soldier.");
                                                     mvprintw(SCREENH-2,SCREENL/4-10,"Deals 45 damage.");
                                                     break;
-                                                case 'h':
+                                                case 1:
                                                     mvprintw(SCREENH-4,SCREENL/4-10,"Reparing tools : Used to fix");
                                                     mvprintw(SCREENH-3,SCREENL/4-10,"things on the ship");
                                                     mvprintw(SCREENH-2,SCREENL/4-10,"Deals 10 damage.");
@@ -1900,7 +2068,7 @@ int Movement(Dungeon spaceStation,int x,int y){
     return 1;
 }
 
-int Game(Dungeon* spaceStation,char* name, int seed,Character player,int newSave){
+int Game(Dungeon* spaceStation,char* name, int seed,Character player){
     /*The game itself
     Dungeon* : spaceStation : The adress of the map (to change it)
     char* : name : The name of the player
@@ -1917,9 +2085,6 @@ int Game(Dungeon* spaceStation,char* name, int seed,Character player,int newSave
     Weapon* weapon;
 
     halfdelay(10);
-    if (newSave){           // Opposed to load a save
-        //NewSave(*spaceStation,player,name,seed,begin);
-    }
 
     while (choice==0){
         while (k!=27 && k!=73 && k!=105 && begin-time(NULL)+player.timer >= 0 && player.pv > 0 && spaceStation->n_tasks > player.tasksDone){     // Escape, i and I
@@ -2031,8 +2196,14 @@ int Game(Dungeon* spaceStation,char* name, int seed,Character player,int newSave
                     k = 0;
                     break;
                 case 1:     // Save
-                    /*pause = time(NULL);
-                    saved = UpdateSave(*spaceStation,player,name,seed,begin,pause);
+                    pause = time(NULL);
+                    if (SearchSave(name) == -1){
+                        saved = NewSave(*spaceStation,player,name,seed,begin);
+                    }
+                    else{
+                        saved = UpdateSave(*spaceStation,player,name,seed,begin,pause);
+                    }
+
                     if (saved != 0){
                         return saved;
                     }
@@ -2053,7 +2224,7 @@ int Game(Dungeon* spaceStation,char* name, int seed,Character player,int newSave
                             getch();
                             endwin();
                             return 0;
-                    }*/
+                    }
                     break;
                 case 2:     // Return title
                     nocbreak();
@@ -2088,9 +2259,10 @@ int CreateGame(){
     int confirm=1,len=0,k=0,error=0,seed=0;
 
     while (confirm){
-        for (int i=0;i<21;i++){     // Reinitialise the name
+        for (int i=1;i<NAMELIMIT+1;i++){     // Reinitialise the name
             name[i] = '\0';
         }
+        len = 0;
 
         do{                 // Ask for seed
             clear();
@@ -2158,13 +2330,13 @@ int CreateGame(){
     for (int i=0;i<4;i++){          // Initialisation of bag of object
         player.bag.use_pouch[i].exp = 0;
         player.bag.use_pouch[i].heal = 0;
-        player.bag.use_pouch[i].icon = 0;
+        player.bag.use_pouch[i].icon = -1;
         player.bag.use_pouch[i].pickup = 0;
         player.bag.use_pouch[i].x = 0;
         player.bag.use_pouch[i].y = 0;
     }
     for (int i=0;i<2;i++){          // Initialisation of bag of weapons
-        player.bag.weaponPouch[i].icon = 0;
+        player.bag.weaponPouch[i].icon = -1;
         player.bag.weaponPouch[i].x = 0;
         player.bag.weaponPouch[i].y = 0;
         player.bag.weaponPouch[i].pickup = 0;
@@ -2177,7 +2349,7 @@ int CreateGame(){
         return 2;
     }
 
-    error = Game(&spaceStation,name,seed,player,1);
+    error = Game(&spaceStation,name,seed,player);
 
     for (int i=0;i<spaceStation.nr_created;i++){        // Free everything before returning to menu
         free(spaceStation.rooms[i].doors);
@@ -2199,6 +2371,7 @@ int LoadSave(){
             for (int i=0;i<21;i++){     // Reinitialise the name
                 name[i] = '\0';
             }
+            len = 0;
                     
             do{                 // Ask name so you can see character limit (20)
                 clear();
@@ -2222,7 +2395,7 @@ int LoadSave(){
                 k = getch();
             } while ((k!=10)||(len==0));        // Until you press enter
         
-            //error = GetSave(&spaceStation,&player,name,&seed);
+            error = GetSave(&spaceStation,&player,name,&seed);
 
             if (error == 1){
                 confirm = 1;
@@ -2284,7 +2457,7 @@ int LoadSave(){
         }
     }
 
-    error = Game(&spaceStation,name,seed,player,0);
+    error = Game(&spaceStation,name,seed,player);
 
     for (int i=0;i<spaceStation.nr_created;i++){        // Free everything before returning to menu
         free(spaceStation.rooms[i].doors);
