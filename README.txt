@@ -5,4 +5,6 @@ Louis Nardou
 Alexis Beau
 Thémis Tran Tu Thien
 
-/!\ (faire une makefile)
+Commandes à faire pour lancer le code:
+make
+./cy_yonder
