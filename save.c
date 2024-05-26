@@ -1,8 +1,9 @@
 #include "main.h"
 
 int strequal(char* str1,char* str2){
+    /*compare two string char return 0 if they are not the same, else return 1 */
     int size=strlen(str1);
-    if(strlen(str2)!=size){
+    if(strlen(str2)!=size){    //compare the size of the two string char
         return 0;
     }
     for(int i=0;i<size;i++){
@@ -15,13 +16,14 @@ int strequal(char* str1,char* str2){
 }
 
 int NewSave(Dungeon spacestation, Character player, char* name, int seed, time_t timer){
+    /*create a new save inside the file saves.txt according to the variable in parameter return 0 if there is no problem and 2 if the fopen doesn't work*/
     FILE* fp=NULL;
     
-    fp=fopen("saves.txt","a");
-    if (fp == NULL){
+    fp=fopen("saves.txt","a");// open the file saves.txt or create it if it does not exist
+    if (fp == NULL){    // check if the fopen did work
         return 2;
     }
-    fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_END);    // put fp at the end of the file 
         fprintf(fp,"{%s\n",name);
         fprintf(fp,"%d\n",seed);
         fprintf(fp,"%d\n",player.x);
@@ -134,12 +136,13 @@ int SavingChoice(Character player, char* name, int seed, int tasks, time_t* time
 }
 
 int SearchSave(char* name){
+    /*search in saves.txt if there is a save with the name and return it's index in the file or 2 if fopen fail or -1 if the save doesn't exit */
     FILE* fp=NULL;
     int cursor=0;
     int size=0;
     size=strlen(name);
     char c=0;
-    fp= fopen("saves.txt","a");
+    fp= fopen("saves.txt","a");    // create the save in case it doesn't exist
     fclose(fp);
     fp=fopen("saves.txt","r");
     if (fp == NULL){
@@ -165,11 +168,15 @@ int SearchSave(char* name){
 }
 
 int GetSave(Dungeon* spacestation, Character* player, char* name, int* seed){
+/*get the save in saves.txt that has the name name and change all the variable put in parameter if successful return 1,if a fopen failed return 2 and if the save does not exist return -1*/
     FILE *fp;
 
-    if(SearchSave(name)!=-1){
-        fp=fopen("saves.txt","r+");
-        fseek(fp,SearchSave(name)+1,SEEK_SET);
+    if(SearchSave(name)!=-1){    // check if the save exist 
+        fp=fopen("saves.txt","r+");    //open the file saves.txt
+        if(fp==NULL) {
+            return 2;
+        }
+        fseek(fp,SearchSave(name)+1,SEEK_SET);    //set you right after the name name in the file 
         fscanf(fp,"%d",seed);
         fscanf(fp,"%d",&(player->x));
         fscanf(fp,"%d",&(player->y));
@@ -252,27 +259,34 @@ int GetSave(Dungeon* spacestation, Character* player, char* name, int* seed){
 }
 
 int getname(char ** tab){
+    /*create a list of all the name in the file saves.txt*/
     FILE* fp=NULL;
     char c=0;
     char* nom;
-    int size=0;
-    int indice=0;
+    int size=0;    //an index that browse through tab to put each name inside of it
+    int index=0;    //an index that browse through the name to put the letter inside of it     
 
-    fp=fopen("saves.txt","r");
+    fp=fopen("saves.txt","r");    //open saves.txt
+    if(fp==NULL){
+        return 2;
+    }
         c=fgetc(fp);
         while(c!=EOF){
-            if(c=='{'){
+            if(c=='{'){    //check if we are at the start of a save
                 (nom) = malloc(sizeof(char)*(NAMELIMIT+1));
+                if(nom==NULL){
+                    return 2;
+                }
 
                 for (int i=0;i<NAMELIMIT;i++){        // Initialise the name
                     nom[i] = '\0';
                 }
 
                 c=fgetc(fp);
-                indice=0;
+                index=0;    // put the index at the beginning of thee name 
                 do{
-                    nom[indice]=c;
-                    indice++;
+                    nom[index]=c;
+                    index++;
                     c=fgetc(fp);
                 }while(c!='\n');
                 (tab[size]) = nom;
@@ -286,7 +300,7 @@ int getname(char ** tab){
 }
 
 int UpdateSave(Dungeon spacestation, Character player, char* name, int seed,time_t start, time_t pause){
-    /*save the parameter in the file save.txt if the name does not exist return -1*/
+    /*save the parameter in the file save.txt if the name does not exist return -1, return 2 if fopen fail,-2 if the save doesn't exist*/
     char** tab;
     char vide[20];
     int nbsave=0,flag=0,j=0;
