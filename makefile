@@ -1,4 +1,4 @@
-all: exec
+all: cy_yonder
 
 rooms.o: rooms.c main.h
 	gcc -c rooms.c -o rooms.o -lncursesw
@@ -16,8 +16,8 @@ main.o: game.c main.h
 	gcc -c main.c -o main.o -lncursesw
 
 exec: rooms.o affichage.o save.o game.o main.o main.h
-	gcc rooms.o affichage.o save.o game.o main.o -lncursesw -o exec
+	gcc rooms.o affichage.o save.o game.o main.o -lncursesw -o cy-yonder
 
 clean:
 	rm -f *.o
-	rm exec
+	rm cy yonder
