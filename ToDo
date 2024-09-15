@@ -8,18 +8,27 @@ A FAIRE :
 - Monstres : affichage, structure salle, attaques, path finding différents types (one shot ou non?)
 
 OPTIONNEL :
-          Couleur
-        Choisir difficulté ? (taille fenetre/nbr salles/nbr taches/nbr monstres) dans les settings        /O
+          Settings :
+                    Taille fenetre
+                              Fix bug
+                    nbr salle
+                    nbr taches
+                    nbr monstres
+                    enable/disable color
+                    time
+
+          Mettre dans save
+
           Taches = Mini jeu
 
-        (pt fatigue/bouffe??)/O
-        Easter egg                                   /O
-                Des items avec des ref (pie Undertale) ?  /O
-                Seed 0 0 ou autre nbr => ref ? (portal w rats)        /O
+        (pt fatigue/bouffe??)
+        Easter egg
+                Des items avec des ref (pie Undertale) ?
+                Seed 0 0 ou autre nbr => ref ? (portal w rats)
 
-            Si battre le final boss => récupéré avec des clés sur la map ?revenir en 0,0 (afficher qu'il faut aller en 0,0 pour aller faire le boss) => TP dans une arène de boss :0        /O
-          clés /O
-                Réparer coute xp            /O
+            Si battre le final boss => récupéré avec des clés sur la map ?revenir en 0,0 (afficher qu'il faut aller en 0,0 pour aller faire le boss) => TP dans une arène de boss :0
+          clés
+                Réparer coute xp
 
 
 FAIT:
@@ -34,6 +43,7 @@ FAIT:
         Salles : Structure : portes
                             dimensions
     Affichage:
+        Couleur
         Afficher une zone réduite de la map (changement de repère pour que position soit centrale) Murs/perso/
         PV, XP, 
         Timer
